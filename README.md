@@ -23,6 +23,7 @@ Project Organization
     │   ├── midterm
     │   ├── milestone-1
     │   ├── milestone-2
+    │   ├── milestone-3   
     │   └── partners-reports
     └── test_project.py
 

@@ -14,7 +14,7 @@ days_left = 5
 # data collection start time and end time
 # this is different than the observation start day and end day
 starttime = datetime(2019,10,24,6)
-endtime = datetime(2019,11,15,12)# not included
+endtime = datetime(2019,11,5,12)# not included
 timestamps = np.arange(starttime, endtime,
                        timedelta(hours=6)).astype(datetime)
 databook = {}

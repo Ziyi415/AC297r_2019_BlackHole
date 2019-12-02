@@ -105,7 +105,7 @@ class Window(QWidget):
         self.help_btn.clicked.connect(self.openHelp)
     
     def openHelp(self):
-        self.text = '[Reset]\nreset the table to the default one.\n\n[Add]\nadd a new telescope, you will have to enter: \n ---- name(string)\n ---- start time and end time (non-negative integer)\n ---- weight(float, here we use the squared radius)\n ---- availability(boolean, 1 indicates \'in use\', 0 indicates \'out of order\', works the same as directly removing the row).\n\n[Remove]\nremove the selected row (if more than 2 items in the tale is selected, the row(s) they are on are the selected rows).\n\n[Update This Time]\nuse the edited table for analysis only for this time.\n\n[Update as Default]\nuse this edited table as the default in the future as well.'
+        self.text = '[Reset]\nreset the table to the default one.\n\n[Add]\nadd a new telescope, you will have to enter: \n ---- name(string)\n ---- start time and end time (non-negative integer)\n ---- weight(float, here we use the squared radius).\n\n[Remove]\nremove the selected row (if more than 2 items in the tale is selected, the row(s) they are on are the selected rows).\n\n[Update This Time]\nuse the edited table for analysis only for this time.\n\n[Update as Default]\nuse this edited table as the default in the future as well.'
         QMessageBox.information(self,'Information', self.text)       
     
 

@@ -14,7 +14,7 @@ days_left = 5
 # data collection start time and end time
 # this is different than the observation start day and end day
 starttime = datetime(2019,10,24,6)
-endtime = datetime(2019,11,31,0)# not included
+endtime = datetime(2019,12,1,0)# not included
 # Input from GUI
 data_path = "../notebooks/data/"
 

@@ -14,25 +14,30 @@ days_left = 5
 # data collection start time and end time
 # this is different than the observation start day and end day
 starttime = datetime(2019,10,24,6)
-endtime = datetime(2019,11,5,12)# not included
-timestamps = np.arange(starttime, endtime,
-                       timedelta(hours=6)).astype(datetime)
-databook = {}
-for site in settings.telescopes:
-    databook[site] = dict.fromkeys(timestamps)
+endtime = datetime(2019,11,31,0)# not included
+# Input from GUI
+data_path = "../notebooks/data/"
 
-for ts in settings.telescopes:
-    for t in timestamps:
-        # Input from GUI
-        filepath = "../notebooks/data/" + ts + "/" + t.strftime("%Y%m%d_%H:%M:%S")
-        try:
-            df = pd.read_csv(filepath, delim_whitespace= True, skiprows= 1, header = None)
-            df.columns = ["date", "tau225", "Tb[k]", "pwv[mm]", "lwp[kg*m^-2]","iwp[kg*m^-2]","o3[DU]"]
-            df['date'] = pd.to_datetime(df['date'], format = "%Y%m%d_%H:%M:%S")
-            databook[ts][t] = df
-        except FileNotFoundError:
-            databook[ts][t] = None
+def build_databook(starttime, endtime, data_path):
+    timestamps = np.arange(starttime, endtime,
+                           timedelta(hours=6)).astype(datetime)
+    databook = {}
+    for site in settings.telescopes:
+        databook[site] = dict.fromkeys(timestamps)
 
+    for site in settings.telescopes:
+        for t in timestamps:
+            filepath = data_path + site + "/" + t.strftime("%Y%m%d_%H:%M:%S")
+            try:
+                df = pd.read_csv(filepath, delim_whitespace= True, skiprows= 1, header = None)
+                df.columns = ["date", "tau225", "Tb[k]", "pwv[mm]", "lwp[kg*m^-2]","iwp[kg*m^-2]","o3[DU]"]
+                df['date'] = pd.to_datetime(df['date'], format = "%Y%m%d_%H:%M:%S")
+                databook[site][t] = df
+            except FileNotFoundError:
+                databook[site][t] = None
+    return databook
+
+databook = build_databook(starttime, endtime, data_path)
 
 # print(settings.telescopes[0],timestamps[1], databook[settings.telescopes[0]][timestamps[1]].head())
 

@@ -3,6 +3,7 @@ import numpy as np
 ### Inputs from GUI
 
 # change the name of each telescopes here
+# must be the same as data folder name
 telescopes = ['12-meter', 'alma', 'apex', 'aste', 'iram', 'jcmt', 'lmt', 'sma', 'smt', 'spt']
 
 # change the weight of each telescopes here

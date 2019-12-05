@@ -10,10 +10,10 @@ def decision_making_single_punishment(day_current_str, end_day_str, days_to_trig
     each_day_reward = processing_data.all_day_reward(day_current_str, end_day_str, distance = True)
 
     # inflate the values on each day
-    a = np.array([n * ((1 + punish_level) ** i) for i, n in enumerate(each_day_reward['value'])])
+    scores = np.array([n * ((1 + punish_level) ** i) for i, n in enumerate(each_day_reward['value'])])
 
     # select the 'days_to_trigger' number of days having maximum reward values
-    selected_days = np.array(each_day_reward.index)[np.argsort(a)[-1:-days_to_trigger - 1:-1]]
+    selected_days = np.array(each_day_reward.index)[np.argsort(scores)[-1:-days_to_trigger - 1:-1]]
 
     if day_current_str in selected_days:
         # print('We suggest triggering on today {}'.format(day_current_str))
@@ -24,7 +24,7 @@ def decision_making_single_punishment(day_current_str, end_day_str, days_to_trig
     # print('And we suggest to trigger by the following sequence: {}'.format(np.array(sorted(selected_days))))
     # dic = dict(zip(each_day_reward.index, a))
     # print('The discounted reward values for all the future days are ', dic)
-    return output, selected_days, None
+    return output, selected_days, None, scores
 
 
 def decision_making_further_std_punishment(day_current_str, end_day_str, days_to_trigger, punish_level=0, distance = True):
@@ -45,7 +45,7 @@ def decision_making_further_std_punishment(day_current_str, end_day_str, days_to
     # print('And we suggest to trigger by the following sequence: {}'.format(np.array(sorted(selected_days))))
     # dic = each_day_reward.to_dict()['value']
     # print('The discounted reward values for all the future days are ', dic)
-    return output, selected_days, None
+    return output, selected_days, None, each_day_reward
 
 
 def decision_making_time_std_punishment(day_current_str, end_day_str, days_to_trigger, punish_level=0, distance = True):
@@ -66,7 +66,7 @@ def decision_making_time_std_punishment(day_current_str, end_day_str, days_to_tr
     # print('And we suggest to trigger by the following sequence: {}'.format(np.array(sorted(selected_days))))
     # dic = each_day_reward.to_dict()['value']
     # print('The discounted reward values for all the future days are ', dic)
-    return output, selected_days, None
+    return output, selected_days, None, each_day_reward
 
 
 def decision_making_sampling(day_current_str, end_day_str, days_to_trigger, punish_level=0, distance = True):
@@ -100,6 +100,6 @@ def decision_making_sampling(day_current_str, end_day_str, days_to_trigger, puni
         #                                                                               1 - prob_current_day))
         output = False
     # print('The suggested path is ' + suggested_path + ' (Confidence Level {})'.format(prob_suggested_path))
-    return output, suggested_path, prob_suggested_path
+    return output, suggested_path, prob_suggested_path, each_day_reward
 
 print("make_suggestions")

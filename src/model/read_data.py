@@ -16,7 +16,7 @@ days_left = settings.days_left
 start_date_list = start_date.split('-')
 end_date_list = end_date.split('-')
 
-starttime = datetime(int(start_date_list[0]), int(start_date_list[1]), int(start_date_list[2]), 0) - timedelta(days=1)
+starttime = datetime(int(start_date_list[0]), int(start_date_list[1]), int(start_date_list[2]), 0) - timedelta(days=16)
 endtime = datetime(int(end_date_list[0]), int(end_date_list[1]), int(end_date_list[2]), 0) + timedelta(days=1)
 
 # starttime = datetime(2019,10,24,6)
@@ -59,11 +59,11 @@ for site in settings.telescopes:
         true_tau225[idx] = values.values[~values.isna()][-1]
 
     # compute standard error v.s. # days forward
-    # df_diff = (df_tau225.T - true_tau225).T
-    # std = []
-    # for i in range(1, df_mask.max().max() + 1):
-    #     std.append((np.nanmean(df_diff[df_mask == i].values ** 2)) ** (1 / 2))
+    df_diff = (df_tau225.T - true_tau225).T
+    std = []
+    for i in range(1, df_mask.max().max() + 1):
+        std.append((np.nanmean(df_diff[df_mask == i].values ** 2)) ** (1 / 2))
 
-    # std_dict[site] = std[:10]
+    std_dict[site] = std[:10]
 
 print("read_data")

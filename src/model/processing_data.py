@@ -68,7 +68,7 @@ def day_reward(telescope_name, day_current_str, end_day_str, start_time, end_tim
     return df_tau_day
 
 
-def all_day_reward(day_current_str, end_day_str, time_std=False, further_std=False, punish_level=1, sampled=False, distance = True):
+def all_day_reward(day_current_str, end_day_str, time_std=False, further_std=False, punish_level=1, sampled=False, distance = True, use_as_evaluate=False):
     """
     calculate F(D) for D in range(day_current_str, end_day_str)
     taking in every single telescope we currently have
@@ -82,7 +82,7 @@ def all_day_reward(day_current_str, end_day_str, time_std=False, further_std=Fal
                                            settings.dict_schedule[settings.telescopes[0]][0],
                                            settings.dict_schedule[settings.telescopes[0]][1], \
                                            time_std=time_std, further_std=further_std, punish_level=punish_level,
-                                           sampled=sampled) \
+                                           sampled=sampled, use_as_evaluate=use_as_evaluate) \
                                 * settings.dict_weight[settings.telescopes[0]]
         # set up a matrix f.T
         f_T = telescopes_day_reward.values
@@ -92,7 +92,7 @@ def all_day_reward(day_current_str, end_day_str, time_std=False, further_std=Fal
             new_telescope = day_reward(i, day_current_str, end_day_str, \
                                                 settings.dict_schedule[i][0], settings.dict_schedule[i][1], \
                                                 time_std=time_std, further_std=further_std, punish_level=punish_level,
-                                                sampled=sampled) \
+                                                sampled=sampled, use_as_evaluate=use_as_evaluate) \
                                      * settings.dict_weight[i]
             f_T = np.hstack([f_T, new_telescope.values])
         # calculate the number of telescopes
@@ -119,7 +119,7 @@ def all_day_reward(day_current_str, end_day_str, time_std=False, further_std=Fal
                                            settings.dict_schedule[settings.telescopes[0]][0],
                                            settings.dict_schedule[settings.telescopes[0]][1], \
                                            time_std=time_std, further_std=further_std, punish_level=punish_level,
-                                           sampled=sampled) \
+                                           sampled=sampled, use_as_evaluate=use_as_evaluate) \
                                 * settings.dict_weight[settings.telescopes[0]]
 
         # calculate the number of telescopes
@@ -136,7 +136,7 @@ def all_day_reward(day_current_str, end_day_str, time_std=False, further_std=Fal
             new_telescope = day_reward(i, day_current_str, end_day_str, \
                        settings.dict_schedule[i][0], settings.dict_schedule[i][1], \
                        time_std=time_std, further_std=further_std, punish_level=punish_level,
-                       sampled=sampled) * settings.dict_weight[i]
+                       sampled=sampled, use_as_evaluate=use_as_evaluate) * settings.dict_weight[i]
             sampled_f[index] = new_telescope.values
 
 
@@ -160,7 +160,7 @@ def all_day_reward(day_current_str, end_day_str, time_std=False, further_std=Fal
         telescopes_day_reward = day_reward(settings.telescopes[0], day_current_str, end_day_str, \
                                            settings.dict_schedule[settings.telescopes[0]][0], settings.dict_schedule[settings.telescopes[0]][1], \
                                            time_std=time_std, further_std=further_std, punish_level=punish_level,
-                                           sampled=sampled) \
+                                           sampled=sampled, use_as_evaluate=use_as_evaluate) \
                                 * settings.dict_weight[settings.telescopes[0]]
 
         # fill up the dataframe
@@ -168,7 +168,7 @@ def all_day_reward(day_current_str, end_day_str, time_std=False, further_std=Fal
             telescopes_day_reward += day_reward(i, day_current_str, end_day_str, \
                                                 settings.dict_schedule[i][0], settings.dict_schedule[i][1], \
                                                 time_std=time_std, further_std=further_std, punish_level=punish_level,
-                                                sampled=sampled) \
+                                                sampled=sampled, use_as_evaluate=use_as_evaluate) \
                                      * settings.dict_weight[i]
         F = telescopes_day_reward / sum(settings.weights)
 

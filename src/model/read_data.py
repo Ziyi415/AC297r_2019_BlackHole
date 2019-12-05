@@ -13,11 +13,9 @@ days_left = settings.days_left
 ### build databook
 # data collection start time and end time
 # this is different than the observation start day and end day
-start_date_list = start_date.split('-')
-end_date_list = end_date.split('-')
 
-starttime = datetime(int(start_date_list[0]), int(start_date_list[1]), int(start_date_list[2]), 0) - timedelta(days=16)
-endtime = datetime(int(end_date_list[0]), int(end_date_list[1]), int(end_date_list[2]), 0) + timedelta(days=1)
+starttime = datetime.strptime(start_date,"%Y-%m-%d") - timedelta(days=16)
+endtime = datetime.strptime(end_date,"%Y-%m-%d") + timedelta(days=1)
 
 # starttime = datetime(2019,10,24,6)
 # endtime = datetime(2019,11,15,12)# not included

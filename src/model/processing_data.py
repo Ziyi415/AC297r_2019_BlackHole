@@ -1,7 +1,7 @@
 from model import settings, read_data
 import numpy as np
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 def day_reward(telescope_name, day_current_str, end_day_str, start_time, end_time, \

@@ -19,26 +19,33 @@ endtime = datetime.strptime(end_date,"%Y-%m-%d") + timedelta(days=1)
 
 # starttime = datetime(2019,10,24,6)
 # endtime = datetime(2019,11,15,12)# not included
-timestamps = np.arange(starttime, endtime,
-                       timedelta(hours=6)).astype(datetime)
-databook = {}
-for site in settings.telescopes:
-    databook[site] = dict.fromkeys(timestamps)
+def create_databook(starttime, endtime):
+    timestamps = np.arange(starttime, endtime,
+                        timedelta(hours=6)).astype(datetime)
+    databook = {}
+    for site in settings.telescopes:
+        databook[site] = dict.fromkeys(timestamps)
 
-for ts in settings.telescopes:
-    for t in timestamps:
-        # Input from GUI
-        filepath = settings.data_path + "/"  + ts + "/" + t.strftime("%Y%m%d_%H:%M:%S")
-        try:
-            df = pd.read_csv(filepath, delim_whitespace= True, skiprows= 1, header = None)
-            df.columns = ["date", "tau225", "Tb[k]", "pwv[mm]", "lwp[kg*m^-2]","iwp[kg*m^-2]","o3[DU]"]
-            df['date'] = pd.to_datetime(df['date'], format = "%Y%m%d_%H:%M:%S")
-            databook[ts][t] = df
-        except FileNotFoundError:
-            databook[ts][t] = None
+    for site in settings.telescopes:
+        for t in timestamps:
+            # Input from GUI
+            filepath = settings.data_path + "/"  + site + "/" + t.strftime("%Y%m%d_%H:%M:%S")
+            try:
+                df = pd.read_csv(filepath, delim_whitespace= True, skiprows= 1, header = None)
+                df.columns = ["date", "tau225", "Tb[k]", "pwv[mm]", "lwp[kg*m^-2]","iwp[kg*m^-2]","o3[DU]"]
+                df['date'] = pd.to_datetime(df['date'], format = "%Y%m%d_%H:%M:%S")
+                databook[site][t] = df
+            except FileNotFoundError:
+                databook[site][t] = None
+    return databook
 
+if settings.training:
+    databook = create_databook( datetime.strptime(settings.available_data_start,"%Y-%m-%d"), \
+                                datetime.strptime(settings.available_data_end,"%Y-%m-%d"))
+else:
+    databook = create_databook(starttime, endtime)
 
-### build std_dict
+### build std_dict - this is the variance only related to # days in the future that the weather model predict
 std_dict = {}
 for site in settings.telescopes:
     data_telescope = databook[site]

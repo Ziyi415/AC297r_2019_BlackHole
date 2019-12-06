@@ -14,11 +14,8 @@ def day_reward(telescope_name, day_current_str, end_day_str, start_time, end_tim
         start_time and end_time (inclusive).
 
     '''
-    split_day_current = day_current_str.split('-')
-    split_day_end = end_day_str.split('-')  # include this day
-
-    day_current = datetime(int(split_day_current[0]), int(split_day_current[1]), int(split_day_current[2]), 0)
-    day_end = datetime(int(split_day_end[0]), int(split_day_end[1]), int(split_day_end[2]) + 1, 0)
+    day_current = datetime.strptime(day_current_str,"%Y-%m-%d")
+    day_end = datetime.strptime(end_day_str,"%Y-%m-%d") + timedelta(days=1)
 
     if not use_as_evaluate:
         # print('t',[t for t in read_data.databook[telescope_name]])

@@ -7,7 +7,7 @@ def main(start_date, end_date, num_days_left, function, punish_level = 0, distan
 
     tau_dict = {}
     for site in settings.telescopes:
-        tau_dict[site] = processing_data.day_reward(site, start_date, end_date, \
+        tau_dict[site] = - processing_data.day_reward(site, start_date, end_date, \
                                            settings.dict_schedule[settings.telescopes[0]][0],
                                            settings.dict_schedule[settings.telescopes[0]][1],punish_level=0)
 

@@ -33,6 +33,6 @@ baseline_lengths = np.array([[0.0, 7.683, 7.681, 7.682, 9.317, 4.553, 2.029, 4.5
 distance = True
 
 # For training/validation purpose
-training = True
-available_data_start = "2019-10-25" # all data for this date must be available (00 06 12 18 o'clock)
+training = False
+available_data_start = "2019-10-24" # all data for this date must be available (00 06 12 18 o'clock)
 available_data_end = "2019-11-30"

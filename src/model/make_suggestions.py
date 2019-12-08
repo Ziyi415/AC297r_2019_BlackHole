@@ -91,9 +91,7 @@ def decision_making_sampling(day_current_str, end_day_str, days_to_trigger, puni
             path_dict[str(i)] += 1
 
     suggested_path = max(path_dict, key=path_dict.get)
-    second_optimal = sorted(path_dict.items(), key=lambda kv: kv[1])[-2][0]
     prob_suggested_path = path_dict[suggested_path] / num_samples
-    prob_second_path = path_dict[second_optimal] / num_samples
     if day_current_str == suggested_path.split("'")[1]:
         # print('We suggest triggering on today {} (Confidence Level {})'.format(day_current_str, prob_current_day))
         output = True
@@ -103,7 +101,14 @@ def decision_making_sampling(day_current_str, end_day_str, days_to_trigger, puni
         output = False
     # print('The suggested path is ' + suggested_path + ' (Confidence Level {})'.format(prob_suggested_path))
     suggested_path = list(suggested_path.split("'"))[1::2] 
-    second_optimal = list(second_optimal.split("'"))[1::2] 
+    try: 
+        second_optimal = sorted(path_dict.items(), key=lambda kv: kv[1])[-2][0]
+        prob_second_path = path_dict[second_optimal] / num_samples
+        second_optimal = list(second_optimal.split("'"))[1::2] 
+    except:
+        second_optimal = None
+        prob_second_path = None
+
     return output, suggested_path, prob_suggested_path, each_day_reward, second_optimal, prob_second_path
 
 print("make_suggestions")

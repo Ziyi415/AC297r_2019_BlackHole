@@ -37,11 +37,18 @@ def single_tele_title():
     """
 
 ########### Model result ############
+def top_layout():
+    return """
+        Layout{
+            background-color: black;
+        }
+    """
 def model_title():
     return """
         QLabel{
             font-size: 20px;
             font-family: Arial Bold;
+            color: white;
         }
     """
 
@@ -60,4 +67,12 @@ def model_result():
         }
     """
 
+########### Contact ############
+def contact_title():
+    return """
+        QLabel{
+            font-size: 20px;
+            font-family: Arial Bold;
+        }
+    """
 

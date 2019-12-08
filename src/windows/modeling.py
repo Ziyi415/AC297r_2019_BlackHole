@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont, QIcon
+from PyQt5.QtGui import QPixmap, QFont, QIcon
 # import style
 from windows import style
 
@@ -21,7 +21,10 @@ class Window(QWidget):
 
     
     def mainDesign(self):
-        self.title = QLabel('Suggested Action Path')
+        self.title = QLabel(self)
+        self.pixmap = QPixmap('images/eht.png')
+        self.sizedPixmap = self.pixmap.scaled(500,1024, Qt.KeepAspectRatio)
+        self.title.setPixmap(self.sizedPixmap)
         self.decision_today_txt = QLabel('Decision 1st Day: ' )
         self.decision_today = QLabel('test')
         
@@ -79,7 +82,6 @@ class Window(QWidget):
         self.setLayout(self.mainLayout)
     
     def styles(self):
-        self.title.setStyleSheet(style.model_title())
 
         self.decision_today_txt.setStyleSheet(style.model_label())
         self.decision_following_txt.setStyleSheet(style.model_label())

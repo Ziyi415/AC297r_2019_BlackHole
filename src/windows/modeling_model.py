@@ -5,6 +5,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import colors
 
 class Window(QDialog):
     def __init__(self, df,parent=None):
@@ -20,7 +21,7 @@ class Window(QDialog):
         # this is the Navigation widget
         # it takes the Canvas widget and a parent
         self.toolbar = NavigationToolbar(self.canvas, self)
-        self.instructions = QLabel('*The lighter the color, the better to trigger (i.e. the smaller the tau225).')
+        self.instructions = QLabel('*The Orange indicates "Trigger"; the White indicates "Not Trigger".')
         # set the layout
         layout = QVBoxLayout()
         layout.addWidget(self.toolbar)
@@ -32,7 +33,12 @@ class Window(QDialog):
 
     def plot(self, df):
         ''' plot some random stuff '''
-        plt.pcolor(1/df)
+        cmap = colors.ListedColormap(['white','#f7c552'])
+        bounds=[0.5]
+        norm = colors.BoundaryNorm(bounds, cmap.N)
+
+        # plt.figure(figsize=(20,5))
+        plt.pcolor(df, cmap=cmap, norm=norm)
         plt.yticks(np.arange(0.5, len(df.index), 1), df.index)
         plt.xticks(np.arange(0.5, len(df.columns), 1), df.columns)
 
@@ -42,9 +48,10 @@ class Window(QDialog):
 if __name__ == '__main__':
     import pandas as pd
     app = QApplication(sys.argv)
-    df = pd.read_csv('data/tau_df.csv', index_col = 0)
+    df = pd.read_csv('data/model_compare.csv', index_col = 0)
 
     main = Window(df)
+    main.resize(1400,500)
     main.show()
 
     sys.exit(app.exec_())

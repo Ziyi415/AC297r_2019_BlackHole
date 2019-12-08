@@ -24,7 +24,7 @@ def decision_making_single_punishment(day_current_str, end_day_str, days_to_trig
     # print('And we suggest to trigger by the following sequence: {}'.format(np.array(sorted(selected_days))))
     # dic = dict(zip(each_day_reward.index, a))
     # print('The discounted reward values for all the future days are ', dic)
-    return output, selected_days, None, scores
+    return output, selected_days, None, scores, None, None
 
 
 def decision_making_further_std_punishment(day_current_str, end_day_str, days_to_trigger, punish_level=0, distance = True, use_as_evaluate=False):
@@ -45,7 +45,7 @@ def decision_making_further_std_punishment(day_current_str, end_day_str, days_to
     # print('And we suggest to trigger by the following sequence: {}'.format(np.array(sorted(selected_days))))
     # dic = each_day_reward.to_dict()['value']
     # print('The discounted reward values for all the future days are ', dic)
-    return output, selected_days, None, each_day_reward
+    return output, selected_days, None, each_day_reward, None, None
 
 
 def decision_making_time_std_punishment(day_current_str, end_day_str, days_to_trigger, punish_level=0, distance = True, use_as_evaluate=False):
@@ -66,7 +66,7 @@ def decision_making_time_std_punishment(day_current_str, end_day_str, days_to_tr
     # print('And we suggest to trigger by the following sequence: {}'.format(np.array(sorted(selected_days))))
     # dic = each_day_reward.to_dict()['value']
     # print('The discounted reward values for all the future days are ', dic)
-    return output, selected_days, None, each_day_reward
+    return output, selected_days, None, each_day_reward, None, None
 
 
 def decision_making_sampling(day_current_str, end_day_str, days_to_trigger, punish_level=0, distance = True, use_as_evaluate=False):
@@ -91,7 +91,9 @@ def decision_making_sampling(day_current_str, end_day_str, days_to_trigger, puni
             path_dict[str(i)] += 1
 
     suggested_path = max(path_dict, key=path_dict.get)
+    second_optimal = sorted(path_dict.items(), key=lambda kv: kv[1])[-2][0]
     prob_suggested_path = path_dict[suggested_path] / num_samples
+    prob_second_path = path_dict[second_optimal] / num_samples
     if day_current_str == suggested_path.split("'")[1]:
         # print('We suggest triggering on today {} (Confidence Level {})'.format(day_current_str, prob_current_day))
         output = True
@@ -100,6 +102,8 @@ def decision_making_sampling(day_current_str, end_day_str, days_to_trigger, puni
         #                                                                               1 - prob_current_day))
         output = False
     # print('The suggested path is ' + suggested_path + ' (Confidence Level {})'.format(prob_suggested_path))
-    return output, suggested_path, prob_suggested_path, each_day_reward
+    suggested_path = list(suggested_path.split("'"))[1::2] 
+    second_optimal = list(second_optimal.split("'"))[1::2] 
+    return output, suggested_path, prob_suggested_path, each_day_reward, second_optimal, prob_second_path
 
 print("make_suggestions")

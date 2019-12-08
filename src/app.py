@@ -4,7 +4,7 @@ from PyQt5.QtGui import QPixmap, QIcon, QFont
 from PyQt5.QtCore import Qt
 import pandas as pd
 import numpy as np
-from windows import Adv_singleTele, Adv_penalty, Adv_length, modeling, style
+from windows import Adv_singleTele, Adv_penalty, Adv_length, modeling, modeling_telescope, modeling_telescope_visualization, style
 from model import write_file
 
 
@@ -45,8 +45,6 @@ class MainWindow(QMainWindow):
         self.advanced.addAction(self.length_tele)
         self.penalty_level= QAction('Penalty Level')
         self.advanced.addAction(self.penalty_level)
-        self.reward_function= QAction('Reward Function')
-        self.advanced.addAction(self.reward_function)
         self.exit_function = QAction('Exit')
         self.exitMenu.addAction(self.exit_function)
 
@@ -86,10 +84,10 @@ class MainWindow(QMainWindow):
         self.length_tele_status = QLabel('Default  ')
         self.penalty_level_txt = QLabel('Penalty Level: ')
         self.penalty_level_status = QLabel('Default  ')
-        self.reward_func_txt = QLabel('Reward Function: ')
-        self.reward_func_status = QLabel('Default  ')
-        self.middleRight_keyList = [self.single_tele_txt, self.length_tele_txt, self.penalty_level_txt, self.reward_func_txt]
-        self.middleRight_valueList  = [self.single_tele_status, self.length_tele_status, self.penalty_level_status, self.reward_func_status]
+        self.useBaseline_txt = QLabel('Use Baseline Length: ')
+        self.useBaseline_status = QCheckBox(self)
+        self.middleRight_keyList = [self.single_tele_txt, self.length_tele_txt, self.penalty_level_txt, self.useBaseline_txt]
+        self.middleRight_valueList  = [self.single_tele_status, self.length_tele_status, self.penalty_level_status, self.useBaseline_status]
         ### Bottom ###
         self.run_btn = QPushButton('RUN', self)       
         
@@ -234,29 +232,65 @@ class MainWindow(QMainWindow):
         try:
             write_file.writeSettings(self.url, self.start_input.text(), self.end_input.text(), int(self.days_input.text()), list(self.singleCurrent.Name), list(self.singleCurrent.Weight), list(zip(self.singleCurrent['Start Time'], self.singleCurrent['End Time'])), baselineMatrix)
         except:
-            QMessageBox.information(self, 'Information', 'Please fulfill all the required info.')
+            QMessageBox.information(self, 'Information', 'Please fill in all the required info correctly.')
             return       
-
+        
         self.run_Model = modeling.Window()
         
-        from model import make_suggestions, settings
-        def run(start_date, end_date, num_days_left, function, punish_level = 0):
+        from model import make_suggestions, settings, processing_data
+        def run(start_date, end_date, num_days_left, function, punish_level = 0, distance = True):
+
+            tau_df = pd.DataFrame({})
+            for site in settings.telescopes:
+                tau_df[site] = list(- processing_data.day_reward(site, start_date, end_date, \
+                                                settings.dict_schedule[settings.telescopes[0]][0],
+                                                settings.dict_schedule[settings.telescopes[0]][1],punish_level=0).value)
+
+            tau_df.index = processing_data.day_reward(settings.telescopes[0], start_date, end_date, \
+                                                settings.dict_schedule[settings.telescopes[0]][0],
+                                                settings.dict_schedule[settings.telescopes[0]][1],punish_level=0).index
+
             if num_days_left <= 0:
-                return None, None, None
+                return None, None, None, None, tau_df, None, None
             else:
-                should_trigger, selected_future_days, confidence_level = function(start_date, end_date, num_days_left, punish_level)
-                return should_trigger, selected_future_days, confidence_level
+                should_trigger, selected_future_days, confidence_level, each_day_score, second_optimal, second_optimal_prob = function(start_date, end_date, num_days_left, punish_level, distance)
+                return should_trigger, sorted(selected_future_days), confidence_level, each_day_score, tau_df, second_optimal, second_optimal_prob
 
-        self.decision_today_result, self.decision_following_result, self.CI_result = run(settings.start_date, settings.end_date, settings.days_left, make_suggestions.decision_making_sampling, 0)
-
+        self.decision_today_result, self.decision_following_result, self.CI_result, _, self.tau_df, self.second_optimal, self.second_prob = run(settings.start_date, settings.end_date, settings.days_left, make_suggestions.decision_making_sampling, self.penaltyLevelValue, self.useBaseline_status.isChecked())
 
         if self.decision_today_result == True:
             self.run_Model.decision_today.setText('Trigger')
         else:
             self.run_Model.decision_today.setText('NOT Trigger')
         
-        self.run_Model.decision_following.setText(self.decision_following_result)
-        self.run_Model.CI.setText(str(self.CI_result))
+        self.return_decision_following = self.decision_following_result
+        breakline_a = np.arange(3, len(self.return_decision_following), 3)
+        breakline_b = np.arange(0, len(breakline_a),1)
+        breakline = breakline_a + breakline_b
+        for i in breakline:
+            self.return_decision_following.insert(i, '\n')
+            self.second_optimal.insert(i, '\n')
+        self.return_decision_following = ' '.join(self.return_decision_following)
+        self.second_optimal = ' '.join(self.second_optimal)
+
+
+        self.run_Model.decision_today_txt.setText('  Decision on '+self.start_input.text()+':')
+        self.run_Model.decision_following.setText(' '+self.return_decision_following)
+        self.run_Model.CI.setText(' '+str(self.CI_result))
+        self.run_Model.decision_second.setText(' '+self.second_optimal)
+        self.run_Model.CI_second.setText(' '+str(self.second_prob))
+
+        self.run_Model.teles_comparison.clicked.connect(self.tele_compare)
+
+    def tele_compare(self):
+        self.run_Compare_Telescope = modeling_telescope.Window(self.tau_df)
+        self.run_Compare_Telescope.heatmap.clicked.connect(self.run_heatmap)
+    
+    def run_heatmap(self):
+        heatmap = modeling_telescope_visualization.Window(self.tau_df)
+        heatmap.show()
+        
+
         
 
 

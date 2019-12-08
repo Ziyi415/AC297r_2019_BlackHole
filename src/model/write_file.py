@@ -19,7 +19,11 @@ def writeSettings(data_path, start_date, end_date, days_left, telescope_name, te
         '\n\n# combine telescope name with hourly schedule and weights',
         '\ndict_schedule = dict(zip(telescopes, schedules))\ndict_weight = dict(zip(telescopes, weights))',
         '\n\n# change the baseline matrix',
-        '\nbaseline_lengths = np.array({})'.format([list(i) for i in baseline_matrix])
+        '\nbaseline_lengths = np.array({})'.format([list(i) for i in baseline_matrix]),
+        '\n\n# For training/validation purpose',
+        '\ntraining = False',
+        '\navailable_data_start = "2019-10-24" # all data for this date must be available (00 06 12 18 oclock)',
+        '\navailable_data_end = "2019-11-30"'
     ]
 
     for i in file_txt:

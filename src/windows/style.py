@@ -22,7 +22,7 @@ def runBtn():
 def singleTeleUpdate():
     return """
         QLabel {
-            color: #ee6c62;
+            color: #C3272B;
         }
     """
 
@@ -33,6 +33,30 @@ def single_tele_title():
         QLabel {
             font-size: 15px;
             font-family: Arial Bold;
+        }
+    """
+
+########### Model result ############
+def model_title():
+    return """
+        QLabel{
+            font-size: 20px;
+            font-family: Arial Bold;
+        }
+    """
+
+def model_label():
+    return """
+        QLabel{
+            font-size: 15px;
+        }
+    """
+
+def model_result():
+    return """
+        QLabel{
+            font-size: 15px;
+            color: #C3272B;
         }
     """
 

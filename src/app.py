@@ -299,7 +299,7 @@ class MainWindow(QMainWindow):
             self.run_Model.decision_second.setText("  Does Not Exist.")
             self.run_Model.CI_second.setText("  Does Not Exist.")            
         def model_compare():
-            model_list = ['Single Discount','Further Discount','Uncertainty Today','Sampling(Default)']
+            model_list = ['Discount Factor','Forecast Penalty','Prediction Difficulty of Specific Time','Sampling(Default)']
             df_model = pd.DataFrame(0, index=model_list, columns=self.tau_df.index)
             models = [make_suggestions.decision_making_single_punishment,make_suggestions.decision_making_further_std_punishment,make_suggestions.decision_making_time_std_punishment,make_suggestions.decision_making_sampling]
             penalty_term = [self.penaltyLevelValue_singleDiscount, self.penaltyLevelValue_furtherDiscount, self.penaltyLevelValue_thisTimeDiscount, 0]

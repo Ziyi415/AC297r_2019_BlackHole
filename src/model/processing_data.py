@@ -40,18 +40,18 @@ def day_reward(telescope_name, day_current_str, end_day_str, start_time, end_tim
 
     df_tau_all['latest'] = df_tau_all['tau225'].apply(lambda x: - x[-1])
     df_tau_all['mean'] = df_tau_all['tau225'].apply(lambda x: - np.mean(x))
-    df_tau_all['std'] = df_tau_all['tau225'].apply(lambda x: np.std(x))
-    df_tau_all['mse'] = df_tau_all['tau225'].apply(lambda x: np.mean((np.array(x) - x[-1])**2))
+    # df_tau_all['std'] = df_tau_all['tau225'].apply(lambda x: np.std(x)) #not used
+    df_tau_all['rmse'] = df_tau_all['tau225'].apply(lambda x: np.sqrt(np.mean((np.array(x) - x[-1])**2)))
 
     if sampled:
         sample_df = pd.DataFrame(
-            np.random.normal(df_tau_all['latest'], df_tau_all['mse'], (100, len(df_tau_all))).T)
+            np.random.normal(df_tau_all['latest'], df_tau_all['rmse'], (100, len(df_tau_all))).T)
         df_tau_all = pd.concat([df_tau_all[['date', 'day']], sample_df], axis=1)
         df_tau_day = pd.DataFrame(df_tau_all.groupby('day').mean())
 
     elif time_std:
         df_tau_day = pd.DataFrame(df_tau_all.groupby('day').apply(
-            lambda x: np.mean(x['latest'] * np.exp(punish_level * x['mse']))))  # should be mse
+            lambda x: np.mean(x['latest'] * np.exp(punish_level * x['rmse']))))  # should be mse
         df_tau_day.columns = ['value']
 
     else:

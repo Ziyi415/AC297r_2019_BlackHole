@@ -247,26 +247,28 @@ class MainWindow(QMainWindow):
         
         self.run_Model = modeling.Window()
 
-        from model import processing_data, make_suggestions, settings
-        def run(start_date, end_date, num_days_left, function, punish_level = 0, distance = True):
+        from model import processing_data, make_suggestions, settings, read_data
+        def run(start_date, end_date, num_days_left, function, databook, std_dict, punish_level = 0, distance = True):
+
 
             tau_df = pd.DataFrame({})
             for site in settings.telescopes:
                 tau_df[site] = list(- processing_data.day_reward(site, start_date, end_date, \
                                                 settings.dict_schedule[settings.telescopes[0]][0],
-                                                settings.dict_schedule[settings.telescopes[0]][1],punish_level=0).value)
+                                                settings.dict_schedule[settings.telescopes[0]][1],databook, std_dict, punish_level=0).value)
 
             tau_df.index = processing_data.day_reward(settings.telescopes[0], start_date, end_date, \
                                                 settings.dict_schedule[settings.telescopes[0]][0],
-                                                settings.dict_schedule[settings.telescopes[0]][1],punish_level=0).index
+                                                settings.dict_schedule[settings.telescopes[0]][1],databook, std_dict, punish_level=0).index
 
             if num_days_left <= 0:
                 return None, None, None, None, tau_df, None, None
             else:
-                should_trigger, selected_future_days, confidence_level, each_day_score, second_optimal, second_optimal_prob = function(start_date, end_date, num_days_left, punish_level, distance)
+                should_trigger, selected_future_days, confidence_level, each_day_score, second_optimal, second_optimal_prob = function(start_date, end_date, databook, std_dict, num_days_left, punish_level, distance)
                 return should_trigger, sorted(selected_future_days), confidence_level, each_day_score, tau_df, second_optimal, second_optimal_prob
 
-        self.decision_today_result, self.decision_following_result, self.CI_result, _, self.tau_df, self.second_optimal, self.second_prob = run(settings.start_date, settings.end_date, settings.days_left, make_suggestions.decision_making_sampling, 0, self.useBaseline_status.isChecked())
+        databook, std_dict = read_data.run_read_data(settings.start_date, settings.end_date)
+        self.decision_today_result, self.decision_following_result, self.CI_result, _, self.tau_df, self.second_optimal, self.second_prob = run(settings.start_date, settings.end_date, settings.days_left, make_suggestions.decision_making_sampling, databook, std_dict, 0, self.useBaseline_status.isChecked())
 
         if self.decision_today_result == True:
             self.run_Model.decision_today.setText(' Trigger')
@@ -302,7 +304,7 @@ class MainWindow(QMainWindow):
             penalty_term = [self.penaltyLevelValue_singleDiscount, self.penaltyLevelValue_furtherDiscount, self.penaltyLevelValue_thisTimeDiscount, 0]
             path_list = []
             for i in range(4):
-                _, path, _, _, _, _, _ = run(settings.start_date, settings.end_date, settings.days_left, models[i], penalty_term[i], self.useBaseline_status.isChecked())
+                _, path, _, _, _, _, _ = run(settings.start_date, settings.end_date, settings.days_left, models[i], databook, std_dict, penalty_term[i], self.useBaseline_status.isChecked())
                 path_list.append(path)  
             for i in range(4):
                 for j in range(settings.days_left):

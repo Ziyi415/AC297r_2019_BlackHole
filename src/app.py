@@ -248,8 +248,8 @@ class MainWindow(QMainWindow):
         self.run_Model = modeling.Window()
 
         from model import processing_data, make_suggestions, settings, read_data
+        from importlib import reload
         def run(start_date, end_date, num_days_left, function, databook, std_dict, punish_level = 0, distance = True):
-
 
             tau_df = pd.DataFrame({})
             for site in settings.telescopes:
@@ -267,6 +267,7 @@ class MainWindow(QMainWindow):
                 should_trigger, selected_future_days, confidence_level, each_day_score, second_optimal, second_optimal_prob = function(start_date, end_date, databook, std_dict, num_days_left, punish_level, distance)
                 return should_trigger, sorted(selected_future_days), confidence_level, each_day_score, tau_df, second_optimal, second_optimal_prob
 
+        reload(settings)
         databook, std_dict = read_data.run_read_data(settings.start_date, settings.end_date)
         self.decision_today_result, self.decision_following_result, self.CI_result, _, self.tau_df, self.second_optimal, self.second_prob = run(settings.start_date, settings.end_date, settings.days_left, make_suggestions.decision_making_sampling, databook, std_dict, 0, self.useBaseline_status.isChecked())
 

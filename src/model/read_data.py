@@ -1,4 +1,5 @@
 from model import settings
+from importlib import reload
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
@@ -10,6 +11,7 @@ def create_databook(starttime, endtime):
     timestamps = np.arange(starttime, endtime,
                         timedelta(hours=6)).astype(datetime)
     databook = {}
+    reload(settings)
     for site in settings.telescopes:
         databook[site] = dict.fromkeys(timestamps)
 
@@ -34,6 +36,7 @@ def run_read_data(start_date, end_date):
     # this is different than the observation start day and end day
     starttime = datetime.strptime(start_date, "%Y-%m-%d") - timedelta(days=16)
     endtime = datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
+    reload(settings)
 
     if settings.training:
         databook = create_databook(datetime.strptime(settings.available_data_start, "%Y-%m-%d"), \

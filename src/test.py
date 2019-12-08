@@ -1,10 +1,11 @@
 from model import make_suggestions, processing_data, read_data
 from model import settings
-import numpy as np
 import pandas as pd
+from importlib import reload
 
 
 def run(start_date, end_date, num_days_left, function, databook, std_dict, punish_level=0, distance=True):
+    reload(settings)
     tau_df = pd.DataFrame({})
     for site in settings.telescopes:
         tau_df[site] = list(- processing_data.day_reward(site, start_date, end_date, \

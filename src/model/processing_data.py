@@ -2,7 +2,7 @@ from model import settings
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
-
+from importlib import reload
 
 
 
@@ -17,7 +17,7 @@ def day_reward(telescope_name, day_current_str, end_day_str, start_time, end_tim
         start_time and end_time (inclusive).
 
     '''
-
+    reload(settings)
     day_current = datetime.strptime(day_current_str,"%Y-%m-%d")
     day_end = datetime.strptime(end_day_str,"%Y-%m-%d") + timedelta(days=1)
 
@@ -72,7 +72,7 @@ def all_day_reward(day_current_str, end_day_str, databook, std_dict, time_std=Fa
     weighted their f reward values
     based on area_i/total_area
     """
-
+    reload(settings)
     if distance and not sampled:
         # set up a dataframe
         telescopes_day_reward = day_reward(settings.telescopes[0], day_current_str, end_day_str,

@@ -237,6 +237,8 @@ class MainWindow(QMainWindow):
 
     ############### Run Model Connections ###########
     def addRun(self):
+        self.len_min = min(self.lengthDefault.shape)
+        self.lengthDefault = self.lengthDefault.iloc[self.lengthDefault.index[:self.len_min]][self.lengthDefault.columns[:self.len_min]]
         self.lengthDefault.index = self.lengthDefault.columns
         baselineMatrix = np.array(self.lengthDefault.loc[list(self.singleCurrent.Name), list(self.singleCurrent.Name)])/1000
         try:

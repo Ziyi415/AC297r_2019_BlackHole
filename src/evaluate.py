@@ -9,7 +9,7 @@ def make_one_path(start_date, end_date, num_days_left, function, punish_level = 
     if num_days_left <= 0:
         return None, None, None, None
     
-    should_trigger, selected_future_days, confidence_level, each_day_score= function(start_date, end_date, num_days_left, punish_level, distance, use_as_evaluate=use_as_evaluate)
+    should_trigger, selected_future_days, confidence_level, each_day_score, _, _= function(start_date, end_date, num_days_left, punish_level, distance, use_as_evaluate=use_as_evaluate)
 
     return should_trigger, selected_future_days, confidence_level, each_day_score
 
@@ -90,8 +90,8 @@ path_results = pd.DataFrame.from_dict(path_results, orient='columns')
 score_results = pd.DataFrame.from_dict(score_results, orient='columns')
 
 # checkpoint - save data
-path_results.to_csv("modelComparison/path_results.csv")
-score_results.to_csv("modelComparison/score_results.csv")
+path_results.to_csv("evaluation_results/path_results.csv")
+score_results.to_csv("evaluation_results/score_results.csv")
 
 ####################################################################################
 #### decision_making_single_punishment (model1) ####################################
@@ -108,7 +108,7 @@ for pl in  punish_level_list:
         # this is the path chosen by our model
         # we should update the path every day and get the final path
         our_path = simulate(start_date, end_date, days_left, \
-                make_suggestions.decision_making_single_punishment, pl, settings.distance)
+                make_suggestions.decision_making_single_punishment, pl, settings.baseline_lengths)
 
         # The best path when we look back, and get true reward at the same time by setting use_as_evaluate=True and default punish level=0
 #         _, best_path, _, each_day_true_reward = make_suggestions.decision_making_single_punishment(start_date, end_date, days_left, use_as_evaluate=True)
@@ -131,8 +131,8 @@ for pl in  punish_level_list:
     score_results['model1_punish_'+str(pl)] = score_col
     
 # checkpoint - save results
-path_results.to_csv("modelComparison/path_results.csv")
-score_results.to_csv("modelComparison/score_results.csv")
+path_results.to_csv("evaluation_results/path_results.csv")
+score_results.to_csv("evaluation_results/score_results.csv")
 
 ####################################################################################
 #### decision_making_further_std_punishment (model2) ###############################
@@ -149,7 +149,7 @@ for pl in  punish_level_list:
         # this is the path chosen by our model
         # we should update the path every day and get the final path
         our_path = simulate(start_date, end_date, days_left, \
-                make_suggestions.decision_making_further_std_punishment, pl, settings.distance)
+                make_suggestions.decision_making_further_std_punishment, pl, settings.baseline_lengths)
 
         # The best path when we look back, and get true reward at the same time by setting use_as_evaluate=True and default punish level=0
 #         _, best_path, _, each_day_true_reward = make_suggestions.decision_making_single_punishment(start_date, end_date, days_left, use_as_evaluate=True)
@@ -174,8 +174,8 @@ for pl in  punish_level_list:
     score_results['model2_punish_'+str(pl)] = score_col
     
 # checkpoint - save results
-path_results.to_csv("modelComparison/path_results.csv")
-score_results.to_csv("modelComparison/score_results.csv")
+path_results.to_csv("evaluation_results/path_results.csv")
+score_results.to_csv("evaluation_results/score_results.csv")
 
 ####################################################################################
 #### decision_making_time_std_punishment (model2) ##################################
@@ -192,7 +192,7 @@ for pl in  punish_level_list:
         # this is the path chosen by our model
         # we should update the path every day and get the final path
         our_path = simulate(start_date, end_date, days_left, \
-                make_suggestions.decision_making_time_std_punishment, pl, settings.distance)
+                make_suggestions.decision_making_time_std_punishment, pl, settings.baseline_lengths)
 
         # The best path when we look back, and get true reward at the same time by setting use_as_evaluate=True and default punish level=0
 #         _, best_path, _, each_day_true_reward = make_suggestions.decision_making_single_punishment(start_date, end_date, days_left, use_as_evaluate=True)
@@ -217,8 +217,8 @@ for pl in  punish_level_list:
     score_results['model3_punish_'+str(pl)] = score_col
     
 # checkpoint - save results
-path_results.to_csv("modelComparison/path_results.csv")
-score_results.to_csv("modelComparison/score_results.csv")
+path_results.to_csv("evaluation_results/path_results.csv")
+score_results.to_csv("evaluation_results/score_results.csv")
 
 ####################################################################################
 #### decision_making_sampling (model2) #############################################
@@ -235,7 +235,7 @@ for pl in  punish_level_list:
         # this is the path chosen by our model
         # we should update the path every day and get the final path
         our_path = simulate(start_date, end_date, days_left, \
-                make_suggestions.decision_making_time_std_punishment, pl, settings.distance)
+                make_suggestions.decision_making_time_std_punishment, pl, settings.baseline_lengths)
 
         # The best path when we look back, and get true reward at the same time by setting use_as_evaluate=True and default punish level=0
 #         _, best_path, _, each_day_true_reward = make_suggestions.decision_making_single_punishment(start_date, end_date, days_left, use_as_evaluate=True)
@@ -260,5 +260,30 @@ for pl in  punish_level_list:
     score_results['model4_punish_'+str(pl)] = score_col
 
 # checkpoint - save results
-path_results.to_csv("modelComparison/path_results.csv")
-score_results.to_csv("modelComparison/score_results.csv")
+path_results.to_csv("evaluation_results/path_results.csv")
+score_results.to_csv("evaluation_results/score_results.csv")
+
+####################################################################################
+#### result analysis (all models) ##################################################
+####################################################################################
+
+
+# reload result dataset
+path_results = pd.read_csv("evaluation_results/path_results.csv", index_col = 0)
+score_results = pd.read_csv("evaluation_results/score_results.csv", index_col = 0)
+
+convert_reward = lambda x: [float(a.strip("\n")) for a in x.strip("[] ").split(" ") if a != ""]
+path_results['true_reward'] = path_results['true_reward'].apply(convert_reward)
+path_results['range'] = path_results['range'].apply(lambda x: eval(x))
+score_results['range'] = score_results['range'].apply(lambda x: eval(x))
+
+# Compare score across different models: 
+# MSE = mean((model_score - best_score)^2). 
+# The mean is taken across different (start_date, end_date) pairs.
+
+mse = {}
+for col in score_results.columns[3:]:
+    mse[col] = ((score_results[col] - score_results['best_score'])**2).mean()
+
+mse = pd.Series(mse)
+mse.sort_values()

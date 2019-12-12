@@ -2,8 +2,8 @@ from model import settings
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
-# import warnings
-# warnings.filterwarnings('ignore')
+import warnings
+warnings.filterwarnings('ignore')
 
 
 # ### inputs from GUI
@@ -46,31 +46,31 @@ if settings.training:
 else:
     databook = create_databook(starttime, endtime)
 
-# ### build std_dict - this is the variance only related to # days in the future that the weather model predict
-# std_dict = {}
-# for site in settings.telescopes:
-#     data_telescope = databook[site]
-#     df_tau225 = pd.concat([data_telescope[t].set_index('date')['tau225'] for t in data_telescope if data_telescope[t] is not None], axis=1)
-#     df_tau225.columns = [t for t in data_telescope if data_telescope[t] is not None]
+### build std_dict - this is the variance only related to # days in the future that the weather model predict
+std_dict = {}
+for site in settings.telescopes:
+    data_telescope = databook[site]
+    df_tau225 = pd.concat([data_telescope[t].set_index('date')['tau225'] for t in data_telescope if data_telescope[t] is not None], axis=1)
+    df_tau225.columns = [t for t in data_telescope if data_telescope[t] is not None]
 
-#     # use df_mask to record the number of days forward (index - col) for each prediction
-#     df_mask = pd.DataFrame(index=df_tau225.index, columns=df_tau225.columns)
-#     for col in df_tau225.columns:
-#         df_mask[col] = (df_tau225.index - col).days
+    # use df_mask to record the number of days forward (index - col) for each prediction
+    df_mask = pd.DataFrame(index=df_tau225.index, columns=df_tau225.columns)
+    for col in df_tau225.columns:
+        df_mask[col] = (df_tau225.index - col).days
 
-#     # get 'true' tau225 value, which is the closest prediction within a day
-#     true_tau225 = pd.Series(index=df_tau225.index)
-#     for idx in df_tau225.index:
-#         values = df_tau225.loc[idx]
-#         true_tau225[idx] = values.values[~values.isna()][-1]
+    # get 'true' tau225 value, which is the closest prediction within a day
+    true_tau225 = pd.Series(index=df_tau225.index)
+    for idx in df_tau225.index:
+        values = df_tau225.loc[idx]
+        true_tau225[idx] = values.values[~values.isna()][-1]
 
-#     # compute standard error v.s. # days forward
-#     df_diff = (df_tau225.T - true_tau225).T
-#     std = []
-#     for i in range(1, df_mask.max().max() + 1):
-#         std.append((np.nanmean(df_diff[df_mask == i].values ** 2)) ** (1 / 2))
+    # compute standard error v.s. # days forward
+    df_diff = (df_tau225.T - true_tau225).T
+    std = []
+    for i in range(1, df_mask.max().max() + 1):
+        std.append((np.nanmean(df_diff[df_mask == i].values ** 2)) ** (1 / 2))
 
-#     std_dict[site] = std[:10]
+    std_dict[site] = std[:10]
 
 print("read_data")
 

@@ -76,19 +76,26 @@ In `model/`, `make_suggestions.py` includes all four methods described <a href="
 
 `settings.py` sets the basic settings and parameters for running our model which include forecast data path, telescope names, window information and scheduling information. With `write_file.py`, these settings are also connected to our software where you can accessed and modified them. Although it is preferred to use our software to access the settings, you can still update the file directly and run our models via python scripting.
 
-`forecast_data/` folder includes all the weather forecast data we pulled from the Global Forecast System (GFS) from 10/25/2019 to 11/30/2019, whereas `data/` folder [also stores the parameters???] Currently, the data path defined in `settings.py` is the path to `forecast_data/`.
+`forecast_data/` folder includes all the weather forecast data we pulled from the Global Forecast System (GFS) from 10/25/2019 to 11/30/2019, whereas `data/` folder stores the baseline length matrix and the schedule and info for single telescopes. You can directly change the database by editing the csv file or you can update the databases by using our software. Currently, the data path defined in `settings.py` is the path to `forecast_data/`.
 
-[`windows/`, `images/`....]
+`windows/` and `images/` are folders that contain files to support our software. 
 
 `evaluation_results/` has the model evaluation results from backtesting, which is the output of `evaluate.py`. The paths and scores are produced by all our models with different penalty levels on the training data, and are used for model comparison. Still, details can be found in our <a href="https://medium.com/@ziyi_zhou/optimal-real-time-scheduling-for-black-hole-imaging-e129b33db160">blog post</a>.
 
 `test.py` includes an example to run our model and make a path suggestion in python.
 
-
 # How to use our software
 
-Please refer to the video demo of our software. <a href="https://www.youtube.com/watch?v=UKHaZE5Ws6c">EHT software demo</a>
+After completing all steps in **How to install**, Please navigate to the `src` folder, and type the following command:
+```
+python3 app.py
+```
+The graphical user interface should pop-out. 
 
+Please refer to the video demo of our software. <a href="https://www.youtube.com/watch?v=UKHaZE5Ws6c">EHT software demo</a>
+Notice: if you want to edit any element in the table in the interface, please press 'return' or move to other element after you have edited the element you want. 
+
+You can also directly run the python scripts. More info please see the following the **How to use our package** section.
 
 # How to use our package
 

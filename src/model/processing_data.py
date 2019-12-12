@@ -1,10 +1,13 @@
-from model import settings, read_data
+from model import settings
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
+from importlib import reload
 
 
-def day_reward(telescope_name, day_current_str, end_day_str, start_time, end_time, \
+
+
+def day_reward(telescope_name, day_current_str, end_day_str, start_time, end_time, databook, std_dict,\
                use_as_evaluate=False, time_std=False, further_std=False, punish_level=1, sampled=False):
     '''
     For the specified telescope, return a dataframe with two columns.
@@ -14,19 +17,16 @@ def day_reward(telescope_name, day_current_str, end_day_str, start_time, end_tim
         start_time and end_time (inclusive).
 
     '''
+    reload(settings)
     day_current = datetime.strptime(day_current_str,"%Y-%m-%d")
     day_end = datetime.strptime(end_day_str,"%Y-%m-%d") + timedelta(days=1)
 
     if not use_as_evaluate:
-        # print('t',[t for t in read_data.databook[telescope_name]])
-        # print('day_current', day_current)
-        mask = [t < day_current for t in read_data.databook[telescope_name]]
-        t_valid = np.array([t for t in read_data.databook[telescope_name]])[mask]
-        # print('mask', mask)
-        # print('t_valid', t_valid)
-        df_all = pd.concat([read_data.databook[telescope_name][t] for t in t_valid], axis=0)
+        mask = [t < day_current for t in databook[telescope_name]]
+        t_valid = np.array([t for t in databook[telescope_name]])[mask]
+        df_all = pd.concat([databook[telescope_name][t] for t in t_valid], axis=0)
     else:
-        df_all = pd.concat([read_data.databook[telescope_name][t] for t in read_data.databook[telescope_name]], axis=0)
+        df_all = pd.concat([databook[telescope_name][t] for t in databook[telescope_name]], axis=0)
 
     # day and time filter
     df_all = df_all[(df_all.date >= day_current) & (df_all.date < day_end)]
@@ -60,24 +60,25 @@ def day_reward(telescope_name, day_current_str, end_day_str, start_time, end_tim
 
         if further_std:
             df_tau_day['value'] = df_tau_day['value'].values * np.exp(
-                np.array(read_data.std_dict[telescope_name][:len(df_tau_day)]) * punish_level)
+                np.array(std_dict[telescope_name][:len(df_tau_day)]) * punish_level)
 
     return df_tau_day
 
 
-def all_day_reward(day_current_str, end_day_str, time_std=False, further_std=False, punish_level=1, sampled=False, distance = True, use_as_evaluate=False):
+def all_day_reward(day_current_str, end_day_str, databook, std_dict, time_std=False, further_std=False, punish_level=1, sampled=False, distance = True, use_as_evaluate=False):
     """
     calculate F(D) for D in range(day_current_str, end_day_str)
     taking in every single telescope we currently have
     weighted their f reward values
     based on area_i/total_area
     """
-
+    reload(settings)
     if distance and not sampled:
         # set up a dataframe
-        telescopes_day_reward = day_reward(settings.telescopes[0], day_current_str, end_day_str, \
+        telescopes_day_reward = day_reward(settings.telescopes[0], day_current_str, end_day_str,
                                            settings.dict_schedule[settings.telescopes[0]][0],
-                                           settings.dict_schedule[settings.telescopes[0]][1], \
+                                           settings.dict_schedule[settings.telescopes[0]][1],
+                                           databook, std_dict,
                                            time_std=time_std, further_std=further_std, punish_level=punish_level,
                                            sampled=sampled, use_as_evaluate=use_as_evaluate) \
                                 * settings.dict_weight[settings.telescopes[0]]
@@ -86,10 +87,10 @@ def all_day_reward(day_current_str, end_day_str, time_std=False, further_std=Fal
 
         # fill up the matrix
         for i in settings.telescopes[1:]:
-            new_telescope = day_reward(i, day_current_str, end_day_str, \
-                                                settings.dict_schedule[i][0], settings.dict_schedule[i][1], \
-                                                time_std=time_std, further_std=further_std, punish_level=punish_level,
-                                                sampled=sampled, use_as_evaluate=use_as_evaluate) \
+            new_telescope = day_reward(i, day_current_str, end_day_str,
+                                        settings.dict_schedule[i][0], settings.dict_schedule[i][1], databook, std_dict,
+                                        time_std=time_std, further_std=further_std, punish_level=punish_level,
+                                        sampled=sampled, use_as_evaluate=use_as_evaluate) \
                                      * settings.dict_weight[i]
             f_T = np.hstack([f_T, new_telescope.values])
         # calculate the number of telescopes
@@ -114,7 +115,7 @@ def all_day_reward(day_current_str, end_day_str, time_std=False, further_std=Fal
         # run for the first telescope to get number of days
         new_telescope = day_reward(settings.telescopes[0], day_current_str, end_day_str, \
                                            settings.dict_schedule[settings.telescopes[0]][0],
-                                           settings.dict_schedule[settings.telescopes[0]][1], \
+                                           settings.dict_schedule[settings.telescopes[0]][1], databook, std_dict,
                                            time_std=time_std, further_std=further_std, punish_level=punish_level,
                                            sampled=sampled, use_as_evaluate=use_as_evaluate) \
                                 * settings.dict_weight[settings.telescopes[0]]
@@ -131,7 +132,7 @@ def all_day_reward(day_current_str, end_day_str, time_std=False, further_std=Fal
         for i in settings.telescopes[1:]:
             index += 1
             new_telescope = day_reward(i, day_current_str, end_day_str, \
-                       settings.dict_schedule[i][0], settings.dict_schedule[i][1], \
+                       settings.dict_schedule[i][0], settings.dict_schedule[i][1], databook, std_dict,
                        time_std=time_std, further_std=further_std, punish_level=punish_level,
                        sampled=sampled, use_as_evaluate=use_as_evaluate) * settings.dict_weight[i]
             sampled_f[index] = new_telescope.values
@@ -156,6 +157,7 @@ def all_day_reward(day_current_str, end_day_str, time_std=False, further_std=Fal
         # set up a dataframe
         telescopes_day_reward = day_reward(settings.telescopes[0], day_current_str, end_day_str, \
                                            settings.dict_schedule[settings.telescopes[0]][0], settings.dict_schedule[settings.telescopes[0]][1], \
+                                           databook, std_dict,
                                            time_std=time_std, further_std=further_std, punish_level=punish_level,
                                            sampled=sampled, use_as_evaluate=use_as_evaluate) \
                                 * settings.dict_weight[settings.telescopes[0]]
@@ -163,7 +165,8 @@ def all_day_reward(day_current_str, end_day_str, time_std=False, further_std=Fal
         # fill up the dataframe
         for i in settings.telescopes[1:]:
             telescopes_day_reward += day_reward(i, day_current_str, end_day_str, \
-                                                settings.dict_schedule[i][0], settings.dict_schedule[i][1], \
+                                                settings.dict_schedule[i][0], settings.dict_schedule[i][1],
+                                                databook, std_dict,
                                                 time_std=time_std, further_std=further_std, punish_level=punish_level,
                                                 sampled=sampled, use_as_evaluate=use_as_evaluate) \
                                      * settings.dict_weight[i]
@@ -171,4 +174,5 @@ def all_day_reward(day_current_str, end_day_str, time_std=False, further_std=Fal
 
     return F
 
-print("processing_data")
+if __name__ == '__main__':
+    print("processing_data")

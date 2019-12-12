@@ -6,7 +6,7 @@ from PyQt5.QtGui import QFont, QIcon
 class Window(QWidget):  
     def __init__(self):
         super().__init__()
-        self.setGeometry(240+600, 150, 300, 100) # Location(X,Y) and Size(X,Y) of the Window
+        self.setGeometry(240+600, 150, 500, 100) # Location(X,Y) and Size(X,Y) of the Window
         self.UI()
         self.setWindowTitle('Advanced Settings')
         self.show() # we need to show the window
@@ -19,29 +19,36 @@ class Window(QWidget):
         self.connections()
     
     def mainDesign(self):
-        self.title = QLabel('  Penalty Level: ')
-        self.window_penalty_txt = QLineEdit(self)
-        self.window_penalty_txt.setPlaceholderText("Non-Negative")
+        self.title_singleDiscount = QLabel('  Penalty Level for Single Discount Model: ')
+        self.window_penalty_txt_singleDiscount = QLineEdit(self)
+        self.window_penalty_txt_singleDiscount.setPlaceholderText("Non-Negative")
+
+        self.title_furtherDiscount = QLabel('  Penalty Level for Further Discount Model: ')
+        self.window_penalty_txt_furtherDiscount = QLineEdit(self)
+        self.window_penalty_txt_furtherDiscount.setPlaceholderText("Non-Negative")
+
+        self.title_thisTimeDiscount = QLabel('  Penalty Level for Uncertainty Today Model: ')
+        self.window_penalty_txt_thisTimeDiscount = QLineEdit(self)
+        self.window_penalty_txt_thisTimeDiscount.setPlaceholderText("Non-Negative")
+        
         self.update_btn = QPushButton('Update', self)
         self.help_btn = QPushButton('?', self)
 
     def layouts(self):
         ################## Layouts ########################
         self.mainLayout = QVBoxLayout()
-        self.topLayout = QHBoxLayout()
-        self.topLayout_Right = QHBoxLayout()
-        self.topLayout_Left = QHBoxLayout()
+        self.topLayout = QFormLayout()
         self.bottomLayout = QHBoxLayout()
         ################# Adding Child Layouts #############
         # self.topLayout.addStretch()
-        self.topLayout.addLayout(self.topLayout_Left)
-        self.topLayout.addLayout(self.topLayout_Right)
         # self.topLayout.addStretch()
         self.mainLayout.addLayout(self.topLayout)
         self.mainLayout.addLayout(self.bottomLayout)
         ################## Adding Widgets ###################
-        self.topLayout_Left.addWidget(self.title)
-        self.topLayout_Right.addWidget(self.window_penalty_txt)
+        self.topLayout.addRow(self.title_singleDiscount, self.window_penalty_txt_singleDiscount)
+        self.topLayout.addRow(self.title_furtherDiscount, self.window_penalty_txt_furtherDiscount)
+        self.topLayout.addRow(self.title_thisTimeDiscount, self.window_penalty_txt_thisTimeDiscount)
+
         # self.bottomLayout.addStretch()
         self.bottomLayout.addWidget(self.update_btn,83)
         self.bottomLayout.addWidget(self.help_btn,16)

@@ -20,11 +20,12 @@ class Window(QDialog):
         # this is the Navigation widget
         # it takes the Canvas widget and a parent
         self.toolbar = NavigationToolbar(self.canvas, self)
-
+        self.instructions = QLabel('*The lighter the color, the better to trigger (i.e. the smaller the tau225).')
         # set the layout
         layout = QVBoxLayout()
         layout.addWidget(self.toolbar)
         layout.addWidget(self.canvas)
+        layout.addWidget(self.instructions)
         self.setLayout(layout)
 
         self.plot(df)

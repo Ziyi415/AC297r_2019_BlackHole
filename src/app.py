@@ -4,7 +4,7 @@ from PyQt5.QtGui import QPixmap, QIcon, QFont
 from PyQt5.QtCore import Qt
 import pandas as pd
 import numpy as np
-from windows import Adv_singleTele, Adv_penalty, Adv_length, modeling, modeling_telescope, modeling_telescope_visualization, style
+from windows import Adv_singleTele, Adv_penalty, Adv_length, modeling, modeling_telescope, modeling_telescope_visualization, modeling_model, help_moreInfo, style
 from model import write_file
 
 
@@ -12,7 +12,9 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setGeometry(220, 150, 600, 350) # Location(X,Y) and Size(X,Y) of the Window
-        self.penaltyLevelValue = 0
+        self.penaltyLevelValue_singleDiscount = 0
+        self.penaltyLevelValue_furtherDiscount = 0
+        self.penaltyLevelValue_thisTimeDiscount = 0
         self.setFixedSize(600, 350)
         
         self.singleDefault = pd.read_csv('data/single_tele_default.csv')
@@ -48,8 +50,6 @@ class MainWindow(QMainWindow):
         self.exit_function = QAction('Exit')
         self.exitMenu.addAction(self.exit_function)
 
-        self.default_value = QAction('Default Values')
-        self.helpMenu.addAction(self.default_value)
         self.more_info = QAction('More Information')
         self.helpMenu.addAction(self.more_info)
 
@@ -141,7 +141,11 @@ class MainWindow(QMainWindow):
         self.length_tele.triggered.connect(self.openLengthTele)
         self.penalty_level.triggered.connect(self.openPenalty)
         self.run_btn.clicked.connect(self.addRun)
+        self.more_info.triggered.connect(self.openInfo)
     
+    def openInfo(self):
+        self.openContact = help_moreInfo.Window()
+
     def exitFunc(self):
         exitMbox = QMessageBox.question(self, 'Warning', 'Are you sure to exit? \nAll temporary results and updates will be lost.', QMessageBox.Yes|QMessageBox.No, QMessageBox.No)
         if exitMbox == QMessageBox.Yes:
@@ -214,19 +218,27 @@ class MainWindow(QMainWindow):
         self.run_penaltyLevel.update_btn.clicked.connect(self.updatePenalty)
     
     def updatePenalty(self):
-        if len(self.run_penaltyLevel.window_penalty_txt.text()) == 0:
-            QMessageBox.information(self,'Warning', 'Please enter a number.')  
-        else:
-            self.penaltyLevelValue = self.run_penaltyLevel.window_penalty_txt.text()
-            self.penalty_level_status.setText(str(self.penaltyLevelValue))
+        if len(self.run_penaltyLevel.window_penalty_txt_singleDiscount.text()) != 0:
+            self.penaltyLevelValue_singleDiscount = float(self.run_penaltyLevel.window_penalty_txt_singleDiscount.text())
+            self.penalty_level_status.setText('Updated')
             self.penalty_level_status.setStyleSheet(style.singleTeleUpdate())
-            self.run_penaltyLevel.close()
-    
-
         
+        if len(self.run_penaltyLevel.window_penalty_txt_furtherDiscount.text()) != 0:
+            self.penaltyLevelValue_furtherDiscount = float(self.run_penaltyLevel.window_penalty_txt_furtherDiscount.text())
+            self.penalty_level_status.setText('Updated')
+            self.penalty_level_status.setStyleSheet(style.singleTeleUpdate())
+
+        if len(self.run_penaltyLevel.window_penalty_txt_thisTimeDiscount.text()) != 0:
+            self.penaltyLevelValue_thisTimeDiscount = float(self.run_penaltyLevel.window_penalty_txt_thisTimeDiscount.text())
+            self.penalty_level_status.setText('Updated')
+            self.penalty_level_status.setStyleSheet(style.singleTeleUpdate())
+
+        self.run_penaltyLevel.close()        
 
     ############### Run Model Connections ###########
     def addRun(self):
+        self.len_min = min(self.lengthDefault.shape)
+        self.lengthDefault = self.lengthDefault.iloc[self.lengthDefault.index[:self.len_min]][self.lengthDefault.columns[:self.len_min]]
         self.lengthDefault.index = self.lengthDefault.columns
         baselineMatrix = np.array(self.lengthDefault.loc[list(self.singleCurrent.Name), list(self.singleCurrent.Name)])/1000
         try:
@@ -236,32 +248,35 @@ class MainWindow(QMainWindow):
             return       
         
         self.run_Model = modeling.Window()
-        
-        from model import make_suggestions, settings, processing_data
-        def run(start_date, end_date, num_days_left, function, punish_level = 0, distance = True):
+
+        from model import processing_data, make_suggestions, settings, read_data
+        from importlib import reload
+        def run(start_date, end_date, num_days_left, function, databook, std_dict, punish_level = 0, distance = True):
 
             tau_df = pd.DataFrame({})
             for site in settings.telescopes:
                 tau_df[site] = list(- processing_data.day_reward(site, start_date, end_date, \
                                                 settings.dict_schedule[settings.telescopes[0]][0],
-                                                settings.dict_schedule[settings.telescopes[0]][1],punish_level=0).value)
+                                                settings.dict_schedule[settings.telescopes[0]][1],databook, std_dict, punish_level=0).value)
 
             tau_df.index = processing_data.day_reward(settings.telescopes[0], start_date, end_date, \
                                                 settings.dict_schedule[settings.telescopes[0]][0],
-                                                settings.dict_schedule[settings.telescopes[0]][1],punish_level=0).index
+                                                settings.dict_schedule[settings.telescopes[0]][1],databook, std_dict, punish_level=0).index
 
             if num_days_left <= 0:
                 return None, None, None, None, tau_df, None, None
             else:
-                should_trigger, selected_future_days, confidence_level, each_day_score, second_optimal, second_optimal_prob = function(start_date, end_date, num_days_left, punish_level, distance)
+                should_trigger, selected_future_days, confidence_level, each_day_score, second_optimal, second_optimal_prob = function(start_date, end_date, databook, std_dict, num_days_left, punish_level, distance)
                 return should_trigger, sorted(selected_future_days), confidence_level, each_day_score, tau_df, second_optimal, second_optimal_prob
 
-        self.decision_today_result, self.decision_following_result, self.CI_result, _, self.tau_df, self.second_optimal, self.second_prob = run(settings.start_date, settings.end_date, settings.days_left, make_suggestions.decision_making_sampling, self.penaltyLevelValue, self.useBaseline_status.isChecked())
+        reload(settings)
+        databook, std_dict = read_data.run_read_data(settings.start_date, settings.end_date)
+        self.decision_today_result, self.decision_following_result, self.CI_result, _, self.tau_df, self.second_optimal, self.second_prob = run(settings.start_date, settings.end_date, settings.days_left, make_suggestions.decision_making_sampling, databook, std_dict, 0, self.useBaseline_status.isChecked())
 
         if self.decision_today_result == True:
-            self.run_Model.decision_today.setText('Trigger')
+            self.run_Model.decision_today.setText(' Trigger')
         else:
-            self.run_Model.decision_today.setText('NOT Trigger')
+            self.run_Model.decision_today.setText(' NOT Trigger')
         
         self.return_decision_following = self.decision_following_result
         breakline_a = np.arange(3, len(self.return_decision_following), 3)
@@ -269,18 +284,42 @@ class MainWindow(QMainWindow):
         breakline = breakline_a + breakline_b
         for i in breakline:
             self.return_decision_following.insert(i, '\n')
-            self.second_optimal.insert(i, '\n')
+            if self.second_optimal:
+                self.second_optimal.insert(i, '\n')
         self.return_decision_following = ' '.join(self.return_decision_following)
-        self.second_optimal = ' '.join(self.second_optimal)
+        if self.second_optimal:
+            self.second_optimal = ' '.join(self.second_optimal)
 
 
         self.run_Model.decision_today_txt.setText('  Decision on '+self.start_input.text()+':')
         self.run_Model.decision_following.setText(' '+self.return_decision_following)
         self.run_Model.CI.setText(' '+str(self.CI_result))
-        self.run_Model.decision_second.setText(' '+self.second_optimal)
-        self.run_Model.CI_second.setText(' '+str(self.second_prob))
+        if self.second_optimal:
+            self.run_Model.decision_second.setText(' '+self.second_optimal)
+            self.run_Model.CI_second.setText(' '+str(self.second_prob))
+        else:
+            self.run_Model.decision_second.setText("  Does Not Exist.")
+            self.run_Model.CI_second.setText("  Does Not Exist.")            
+        def model_compare():
+            model_list = ['Discount Factor','Forecast Penalty','Prediction Difficulty of Specific Time','Sampling(Default)']
+            df_model = pd.DataFrame(0, index=model_list, columns=self.tau_df.index)
+            models = [make_suggestions.decision_making_single_punishment,make_suggestions.decision_making_further_std_punishment,make_suggestions.decision_making_time_std_punishment,make_suggestions.decision_making_sampling]
+            penalty_term = [self.penaltyLevelValue_singleDiscount, self.penaltyLevelValue_furtherDiscount, self.penaltyLevelValue_thisTimeDiscount, 0]
+            path_list = []
+            for i in range(4):
+                _, path, _, _, _, _, _ = run(settings.start_date, settings.end_date, settings.days_left, models[i], databook, std_dict, penalty_term[i], self.useBaseline_status.isChecked())
+                path_list.append(path)  
+            for i in range(4):
+                for j in range(settings.days_left):
+                    df_model.loc[model_list[i], path_list[i][j]] = 1         
+            model_compare_result = modeling_model.Window(df_model)
+            model_compare_result.resize(1400,500)
+            model_compare_result.show()
 
+        self.run_Model.model_comparison.clicked.connect(model_compare)
         self.run_Model.teles_comparison.clicked.connect(self.tele_compare)
+    
+
 
     def tele_compare(self):
         self.run_Compare_Telescope = modeling_telescope.Window(self.tau_df)

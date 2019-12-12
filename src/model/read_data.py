@@ -232,4 +232,6 @@ def run_read_data(start_date, end_date):
                             0.02375843679944221,
                             0.023605450091265703]}
 
+    return databook, std_dict
+
 

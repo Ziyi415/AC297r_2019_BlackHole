@@ -8,7 +8,7 @@ from importlib import reload
 
 
 def day_reward(telescope_name, day_current_str, end_day_str, start_time, end_time, databook, std_dict,\
-               use_as_evaluate=False, time_std=False, further_std=False, punish_level=1, sampled=False):
+               use_as_evaluate=False, time_std=False, further_std=False, punish_level=0, sampled=False):
     '''
     For the specified telescope, return a dataframe with two columns.
     The first column tells the day in the day window between
@@ -65,7 +65,7 @@ def day_reward(telescope_name, day_current_str, end_day_str, start_time, end_tim
     return df_tau_day
 
 
-def all_day_reward(day_current_str, end_day_str, databook, std_dict, time_std=False, further_std=False, punish_level=1, sampled=False, distance = True, use_as_evaluate=False):
+def all_day_reward(day_current_str, end_day_str, databook, std_dict, time_std=False, further_std=False, punish_level=0, sampled=False, distance = True, use_as_evaluate=False):
     """
     calculate F(D) for D in range(day_current_str, end_day_str)
     taking in every single telescope we currently have

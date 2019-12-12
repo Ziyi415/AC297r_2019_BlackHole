@@ -2,12 +2,12 @@ import numpy as np
 from model import processing_data
 
 
-def decision_making_single_punishment(day_current_str, end_day_str, databook, std_dict, days_to_trigger, punish_level=0, distance = True, use_as_evaluate=False):
+def decision_making_single_punishment(day_current_str, end_day_str, databook, std_dict, days_to_trigger, punish_level=0.03, distance = True, use_as_evaluate=False):
     # day_current_str: YYYY-MM-DD (str) (included)
     # end_day_str: YYYY-MM-DD (str) (included)
     # days_to_trigger: days to trigger (int)
     # days_to_trigger: days to trigger (int)
-    each_day_reward = processing_data.all_day_reward(day_current_str, end_day_str, databook, std_dict, distance = True, use_as_evaluate=use_as_evaluate)
+    each_day_reward = processing_data.all_day_reward(day_current_str, end_day_str, databook, std_dict, punish_level=punish_level, distance = True, use_as_evaluate=use_as_evaluate)
 
     # inflate the values on each day
     scores = np.array([n * ((1 + punish_level) ** i) for i, n in enumerate(each_day_reward['value'])])
@@ -27,7 +27,7 @@ def decision_making_single_punishment(day_current_str, end_day_str, databook, st
     return output, selected_days, None, scores, None, None
 
 
-def decision_making_further_std_punishment(day_current_str, end_day_str, databook, std_dict, days_to_trigger, punish_level=0, distance = True, use_as_evaluate=False):
+def decision_making_further_std_punishment(day_current_str, end_day_str, databook, std_dict, days_to_trigger, punish_level=0.6, distance = True, use_as_evaluate=False):
     # day_current_str: YYYY-MM-DD (str) (included)
     # end_day_str: YYYY-MM-DD (str) (included)
     # days_to_trigger: days to trigger (int)
@@ -48,7 +48,7 @@ def decision_making_further_std_punishment(day_current_str, end_day_str, databoo
     return output, selected_days, None, each_day_reward, None, None
 
 
-def decision_making_time_std_punishment(day_current_str, end_day_str, databook, std_dict, days_to_trigger, punish_level=0, distance = True, use_as_evaluate=False):
+def decision_making_time_std_punishment(day_current_str, end_day_str, databook, std_dict, days_to_trigger, punish_level=1, distance = True, use_as_evaluate=False):
     # day_current_str: YYYY-MM-DD (str) (included)
     # end_day_str: YYYY-MM-DD (str) (included)
     # days_to_trigger: days to trigger (int)

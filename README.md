@@ -35,7 +35,7 @@ Project Organization
     │   └── partners-reports
     └── test_project.py
 
-Our models and software are packaged in `src/` folder which will be explained in Software Organization section. `notebooks/` and `submissions/` include our whole development process, presentation slides and other related files throughout the course. Introduction to this project, including background, problem statement, model designs and evaluation can be found in this blog post: <a href="https://medium.com/@ziyi_zhou/optimal-real-time-scheduling-for-black-hole-imaging-e129b33db160">Optimal Real-time Scheduling for Black Hole Imaging</a>.
+Our models and software are packaged in `src/` folder and is explained in Software Organization section. `notebooks/` and `submissions/` include our whole development process, presentation slides and other related files throughout the course. Introduction to this project, including background, problem statement, model designs and evaluation can be found in this blog post: <a href="https://medium.com/@ziyi_zhou/optimal-real-time-scheduling-for-black-hole-imaging-e129b33db160">Optimal Real-time Scheduling for Black Hole Imaging</a>.
 
 # How to install
 
@@ -83,22 +83,22 @@ databook, std_dict = read_data.run_read_data(settings.start_date, settings.end_d
 ```
 where `databook` is a python dictionary of all the tau225 data across sites and days and `std_dict` is the weather forecast variance we calculated.
 
-To make a suggested path:
+**To make a suggested path**
 
 ```python
 should_trigger, selected_future_days, confidence_level, each_day_score, second_optimal, second_optimal_prob = function(
             start_date, end_date, databook, std_dict, num_days_left, punish_level)
 ```
 
-Input: 
+**Input:** 
 
 `function` should be is one of our four methods,`make_suggestions.decision_making_single_punishment`, `make_suggestions.decision_making_further_std_punishment`, `make_suggestions.decision_making_time_std_punishment` and `make_suggestions.decision_making_sampling`, which correspond to method 1 to method 4 (described in the <a href="https://medium.com/@ziyi_zhou/optimal-real-time-scheduling-for-black-hole-imaging-e129b33db160">blog post</a>) accordingly. 
 
 `start_date`, `end_date`, `num_days_left` could be specified here in spite of what's in `settings.py`, but we recommend using `settings.start_date`, `settings.end_date` and `settings.days_left` consistently as in our `test.py` example.
 
-`punish_level` is the hyperparameter for the first three models. Its default value is already set to the best ones from model evaluation.
+`punish_level` is the hyperparameter for the first three models. Its default value is already set to the best penalty level validated by model evaluation.
 
-Output:
+**Output:**
 
 `should_trigger` indicates whether the model suggests to trigger the `start_date`, and `selected_future_days` is the suggested path. `each_day_score` is an array of scores calculated by the model for each day, and the suggested path include the days with the best scores. Only the last model will return `confidence_level`, `second_optimal`, `second_optimal_prob` instead of `None`.
 

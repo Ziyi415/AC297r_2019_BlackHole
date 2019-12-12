@@ -19,9 +19,9 @@ Project Organization
     │   ├── forecast_data/              data pulled from GFS for each site
     │   ├── data/                       input parameters
     │   ├── windows/                    source code for our software
-    │   ├── evaluation_results/         model evaluation results
     │   ├── images/                     
     │   ├── app.py                      run our software
+    │   ├── evaluation_results/         model evaluation results
     │   ├── evaluate.py                 model evaluation script
     │   └── test.py                     run our model and make a suggestion
     ├── submissions/
@@ -37,23 +37,27 @@ Project Organization
 
 Our models and software are packaged in `src/` folder which will be explained in Software Organization section. `notebooks/` and `submissions/` include our whole development process, presentation slides and other related files throughout the course.
 
---------
 
 # How to install
 
+To install our software
 
---------
+
 
 # Software Organization
 
---------
+`src/`
+
+
 
 # How to use our software
 
 
---------
+
 
 # How to use our package
+
+
 
 --------
 

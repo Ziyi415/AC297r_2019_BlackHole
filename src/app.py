@@ -12,9 +12,9 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setGeometry(220, 150, 600, 350) # Location(X,Y) and Size(X,Y) of the Window
-        self.penaltyLevelValue_singleDiscount = 0
-        self.penaltyLevelValue_furtherDiscount = 0
-        self.penaltyLevelValue_thisTimeDiscount = 0
+        self.penaltyLevelValue_singleDiscount = 0.03
+        self.penaltyLevelValue_furtherDiscount = 0.6
+        self.penaltyLevelValue_thisTimeDiscount = 1
         self.setFixedSize(600, 350)
         
         self.singleDefault = pd.read_csv('data/single_tele_default.csv')

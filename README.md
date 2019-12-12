@@ -90,7 +90,7 @@ After completing all steps in **How to install**, Please navigate to the `src` f
 ```
 python3 app.py
 ```
-The graphical user interface should pop-out. 
+The graphical user interface should pop out. 
 
 Please refer to the video demo of our software. <a href="https://www.youtube.com/watch?v=UKHaZE5Ws6c">EHT software demo</a>
 Notice: if you want to edit any element in the table in the interface, please press 'return' or move to other element after you have edited the element you want. 

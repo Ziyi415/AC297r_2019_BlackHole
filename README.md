@@ -38,8 +38,33 @@ Project Organization
 Our models and software are packaged in `src/` folder and is explained in Software Organization section. `notebooks/` and `submissions/` include our whole development process, presentation slides and other related files throughout the course. Introduction to this project, including background, problem statement, model designs and evaluation can be found in this blog post: <a href="https://medium.com/@ziyi_zhou/optimal-real-time-scheduling-for-black-hole-imaging-e129b33db160">Optimal Real-time Scheduling for Black Hole Imaging</a>.
 
 # How to install
+Clone or download our [GitHub repository](https://github.com/Ziyi415/AC297r_2019_BlackHole) and navigate into this directory in your terminal.
 
-To install our software
+Optional: create a virtual environment using `virtualenv`. This can be downloaded using `pip3` or `easy_install` as follows:
+
+```
+pip3 install virtualenv
+```
+
+or
+
+```
+sudo easy_install virtualenv
+```
+
+Then, create a virtual environment (using Python3), activate this virtual environment, and install the dependencies as follows:
+
+```
+virtualenv -p python3 my_env
+source my_env/bin/activate
+pip3 install -r requirements.txt
+```
+
+In order to deactivate the virtual environment, use the following command
+
+```
+deactivate
+```
 
 
 
@@ -67,7 +92,7 @@ Please refer to the video demo of our software. <a href="https://www.youtube.com
 
 # How to use our package
 
-Once you have downloaded our package (`model/`) and place it in the same folder as your scripts, you can import the moduls:
+Once you have downloaded our package (`model/`) and place it in the same folder as your scripts, you can import the modules:
 
 ```python
 from model import make_suggestions, processing_data, read_data

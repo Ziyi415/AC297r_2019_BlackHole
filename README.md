@@ -35,7 +35,7 @@ Project Organization
     │   └── partners-reports
     └── test_project.py
 
-Our models and software are packaged in `src/` folder and is explained in Software Organization section. `notebooks/` and `submissions/` include our whole development process, presentation slides and other related files throughout the course. Introduction to this project, including background, problem statement, model designs and evaluation can be found in this blog post: <a href="https://medium.com/@ziyi_zhou/optimal-real-time-scheduling-for-black-hole-imaging-e129b33db160">Optimal Real-time Scheduling for Black Hole Imaging</a>.
+Our models and software are packaged in `src/` folder and is explained in **Software Organization** section. `notebooks/` and `submissions/` include our whole development process, presentation slides and other related files throughout the course. Introduction to this project, including background, problem statement, model designs and evaluation can be found in this blog post: <a href="https://medium.com/@ziyi_zhou/optimal-real-time-scheduling-for-black-hole-imaging-e129b33db160">Optimal Real-time Scheduling for Black Hole Imaging</a>.
 
 # How to install
 Clone or download our [GitHub repository](https://github.com/Ziyi415/AC297r_2019_BlackHole) and navigate into this directory in your terminal.
@@ -124,7 +124,7 @@ should_trigger, selected_future_days, confidence_level, each_day_score, second_o
 
 **Input:** 
 
-`function` should be is one of our four methods,`make_suggestions.decision_making_single_punishment`, `make_suggestions.decision_making_further_std_punishment`, `make_suggestions.decision_making_time_std_punishment` and `make_suggestions.decision_making_sampling`, which correspond to method 1 to method 4 (described in the <a href="https://medium.com/@ziyi_zhou/optimal-real-time-scheduling-for-black-hole-imaging-e129b33db160">blog post</a>) accordingly. 
+`function` should be one of our four methods,`make_suggestions.decision_making_single_punishment`, `make_suggestions.decision_making_further_std_punishment`, `make_suggestions.decision_making_time_std_punishment` and `make_suggestions.decision_making_sampling`, which correspond to method 1 to method 4 (described in the <a href="https://medium.com/@ziyi_zhou/optimal-real-time-scheduling-for-black-hole-imaging-e129b33db160">blog post</a>) accordingly. 
 
 `start_date`, `end_date`, `num_days_left` could be specified here in spite of what's in `settings.py`, but we recommend using `settings.start_date`, `settings.end_date` and `settings.days_left` consistently as in our `test.py` example.
 

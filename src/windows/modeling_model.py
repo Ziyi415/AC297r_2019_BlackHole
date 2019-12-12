@@ -45,13 +45,13 @@ class Window(QDialog):
         # refresh canvas
         self.canvas.draw()
 
-if __name__ == '__main__':
-    import pandas as pd
-    app = QApplication(sys.argv)
-    df = pd.read_csv('data/model_compare.csv', index_col = 0)
+# if __name__ == '__main__':
+#     import pandas as pd
+#     app = QApplication(sys.argv)
+#     df = pd.read_csv('data/model_compare.csv', index_col = 0)
 
-    main = Window(df)
-    main.resize(1400,500)
-    main.show()
+#     main = Window(df)
+#     main.resize(1400,500)
+#     main.show()
 
-    sys.exit(app.exec_())
+#     sys.exit(app.exec_())
